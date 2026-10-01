@@ -1,1 +1,732 @@
 # chanbomaydi.github.io
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Nhóm Học Tập</title>
+    <!-- Thư viện Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome cho biểu tượng -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Gray 100 */
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Tùy chỉnh thanh cuộn */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8; 
+        }
+
+        /* Toast thông báo */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .toast {
+            background: white;
+            border-radius: 8px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <header class="bg-indigo-600 text-white shadow-md relative z-10">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white p-2 rounded-lg text-indigo-600">
+                        <i class="fa-solid fa-users text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold tracking-tight">Nhóm Học Tập Tương Tác</h1>
+                        <p class="text-indigo-200 text-sm mt-1">Không gian làm việc chung theo thời gian thực</p>
+                    </div>
+                </div>
+                <!-- Trạng thái kết nối -->
+                <div id="connection-status" class="hidden sm:flex items-center gap-2 text-sm bg-indigo-700 py-1.5 px-3 rounded-full">
+                    <div class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" id="status-dot"></div>
+                    <span id="status-text" class="text-indigo-100">Đang kết nối...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex space-x-1 overflow-x-auto hide-scrollbar pb-2" aria-label="Tabs">
+                <button onclick="switchTab('members')" id="tab-members" class="tab-btn active bg-indigo-700 text-white px-4 py-2.5 rounded-t-lg font-medium text-sm flex items-center gap-2 transition-colors duration-200 whitespace-nowrap">
+                    <i class="fa-solid fa-address-card"></i> Chi tiết nhóm
+                </button>
+                <button onclick="switchTab('documents')" id="tab-documents" class="tab-btn hover:bg-indigo-500/50 text-indigo-100 px-4 py-2.5 rounded-t-lg font-medium text-sm flex items-center gap-2 transition-colors duration-200 whitespace-nowrap">
+                    <i class="fa-solid fa-folder-open"></i> Tài liệu chung
+                </button>
+                <button onclick="switchTab('tasks')" id="tab-tasks" class="tab-btn hover:bg-indigo-500/50 text-indigo-100 px-4 py-2.5 rounded-t-lg font-medium text-sm flex items-center gap-2 transition-colors duration-200 whitespace-nowrap">
+                    <i class="fa-solid fa-list-check"></i> Quản lý bài tập
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- TAB 1: Chi tiết nhóm -->
+        <div id="content-members" class="tab-content active">
+            <div class="mb-6 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-users text-indigo-500"></i> Thành viên nhóm
+                </h2>
+                <span id="member-count" class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded">0 thành viên</span>
+            </div>
+            
+            <!-- Form thêm thành viên -->
+            <div class="glass-panel rounded-2xl p-6 shadow-sm mb-6 bg-white">
+                <form id="member-form" class="flex flex-col md:flex-row gap-4 items-end">
+                    <div class="flex-grow w-full">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tên thành viên</label>
+                        <input type="text" id="member-name" required placeholder="VD: Nguyễn Văn A" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                    </div>
+                    <div class="flex-grow w-full">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Vai trò</label>
+                        <input type="text" id="member-role" required placeholder="VD: Nhóm trưởng" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                    </div>
+                    <div class="flex-grow w-full md:w-1/3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Mô tả nhiệm vụ</label>
+                        <input type="text" id="member-desc" placeholder="Tóm tắt công việc..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                    </div>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition-colors h-[42px] whitespace-nowrap flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus"></i> Thêm
+                    </button>
+                </form>
+            </div>
+
+            <!-- Hiệu ứng tải -->
+            <div id="member-loading" class="p-8 text-center text-gray-400">
+                <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-indigo-400"></i>
+                <p>Đang tải danh sách thành viên...</p>
+            </div>
+
+            <!-- Danh sách thành viên -->
+            <div id="member-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- JS sẽ render thành viên tại đây -->
+            </div>
+            
+            <div class="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-5 flex items-start gap-4 hidden" id="member-notice">
+                <i class="fa-solid fa-circle-info text-blue-500 text-xl mt-0.5"></i>
+                <div>
+                    <h4 class="font-semibold text-blue-800">Đồng bộ thời gian thực</h4>
+                    <p class="text-blue-700 text-sm mt-1">Dữ liệu bạn thêm, sửa tên hoặc xóa sẽ lập tức cập nhật trên máy của mọi người trong nhóm.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Tài liệu -->
+        <div id="content-documents" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Form thêm tài liệu -->
+                <div class="lg:col-span-1">
+                    <div class="glass-panel rounded-2xl p-6 shadow-sm sticky top-6 bg-white">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-plus-circle text-indigo-500"></i> Thêm tài liệu mới
+                        </h2>
+                        <form id="doc-form" class="space-y-4">
+                            <div>
+                                <label for="doc-title" class="block text-sm font-medium text-gray-700 mb-1">Tên tài liệu / Mô tả ngắn</label>
+                                <input type="text" id="doc-title" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="VD: Slide bài giảng chương 1">
+                            </div>
+                            <div>
+                                <label for="doc-link" class="block text-sm font-medium text-gray-700 mb-1">Đường dẫn (Link liên kết)</label>
+                                <input type="url" id="doc-link" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="https://...">
+                            </div>
+                            <div>
+                                <label for="doc-type" class="block text-sm font-medium text-gray-700 mb-1">Loại tài liệu</label>
+                                <select id="doc-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                                    <option value="link">Website/Link</option>
+                                    <option value="pdf">Tài liệu PDF/Word</option>
+                                    <option value="video">Video học liệu</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex justify-center items-center gap-2">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Gửi vào kho chung
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Danh sách tài liệu -->
+                <div class="lg:col-span-2">
+                    <div class="glass-panel rounded-2xl shadow-sm overflow-hidden flex flex-col h-full bg-white">
+                        <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                            <h2 class="text-lg font-bold text-gray-800">Kho tài liệu nhóm</h2>
+                            <span id="doc-count" class="bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-0.5 rounded">0 mục</span>
+                        </div>
+                        
+                        <div class="p-0 overflow-y-auto max-h-[500px]" id="doc-list-container">
+                            <!-- Hiệu ứng tải -->
+                            <div id="doc-loading" class="p-8 text-center text-gray-400">
+                                <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-indigo-400"></i>
+                                <p>Đang tải tài liệu...</p>
+                            </div>
+                            
+                            <!-- Danh sách render tại đây -->
+                            <ul id="doc-list" class="divide-y divide-gray-100">
+                                <!-- JS sẽ chèn các item vào đây -->
+                            </ul>
+                            
+                            <!-- Trống -->
+                            <div id="doc-empty" class="hidden p-12 text-center text-gray-400">
+                                <i class="fa-regular fa-folder-open text-4xl mb-3 text-gray-300"></i>
+                                <p>Chưa có tài liệu nào. Thêm tài liệu bên trái để bắt đầu!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Bài tập -->
+        <div id="content-tasks" class="tab-content">
+            <div class="glass-panel rounded-2xl shadow-sm overflow-hidden mb-8 bg-white">
+                <!-- Form thêm bài tập nhanh -->
+                <div class="p-6 border-b border-gray-100 bg-indigo-50/30">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-clipboard-list text-indigo-500"></i> Giao bài tập mới
+                    </h2>
+                    <form id="task-form" class="flex flex-col sm:flex-row gap-4">
+                        <div class="flex-grow">
+                            <input type="text" id="task-title" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="Nội dung công việc (VD: Hoàn thành slide thuyết trình)...">
+                        </div>
+                        <div class="w-full sm:w-48">
+                            <input type="date" id="task-deadline" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition" title="Hạn chót">
+                        </div>
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-6 rounded-lg transition-colors whitespace-nowrap">
+                            <i class="fa-solid fa-plus mr-1"></i> Thêm
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Danh sách bài tập -->
+                <div class="p-0">
+                    <div class="bg-gray-50 px-6 py-3 border-b border-gray-100 flex justify-between items-center text-sm font-medium text-gray-500">
+                        <span>Danh sách nhiệm vụ</span>
+                        <div class="flex items-center gap-4 text-xs">
+                            <span class="flex items-center gap-1"><i class="fa-regular fa-square text-gray-400"></i> Chưa xong</span>
+                            <span class="flex items-center gap-1"><i class="fa-solid fa-square-check text-green-500"></i> Đã xong</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Hiệu ứng tải -->
+                    <div id="task-loading" class="p-8 text-center text-gray-400">
+                        <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-indigo-400"></i>
+                        <p>Đang đồng bộ bài tập...</p>
+                    </div>
+
+                    <ul id="task-list" class="divide-y divide-gray-100">
+                        <!-- JS sẽ chèn các item vào đây -->
+                    </ul>
+
+                    <!-- Trống -->
+                    <div id="task-empty" class="hidden p-12 text-center text-gray-400">
+                        <i class="fa-solid fa-check-double text-4xl mb-3 text-gray-200"></i>
+                        <p>Tuyệt vời! Hiện không có công việc nào tồn đọng.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- Firebase SDK Modules -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- GLOBAL VARIABLES ---
+        let app, db, auth, currentUser;
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-study-group';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+
+        function updateConnectionStatus(status, text) {
+            const container = document.getElementById('connection-status');
+            container.classList.remove('hidden');
+            statusText.innerText = text;
+            if (status === 'success') {
+                statusDot.className = 'w-2 h-2 rounded-full bg-green-400';
+            } else if (status === 'error') {
+                statusDot.className = 'w-2 h-2 rounded-full bg-red-500';
+            }
+        }
+
+        // --- KHỞI TẠO FIREBASE ---
+        async function initApp() {
+            if (!firebaseConfig) {
+                showToast("Lỗi: Không tìm thấy cấu hình Firebase.", "error");
+                updateConnectionStatus('error', 'Lỗi cấu hình');
+                return;
+            }
+
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (initialToken) {
+                    await signInWithCustomToken(auth, initialToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        currentUser = user;
+                        updateConnectionStatus('success', 'Đã đồng bộ Live');
+                        setupRealtimeListeners();
+                    } else {
+                        updateConnectionStatus('error', 'Mất kết nối');
+                    }
+                });
+            } catch (error) {
+                console.error("Lỗi khởi tạo:", error);
+                showToast("Không thể kết nối máy chủ.", "error");
+                updateConnectionStatus('error', 'Lỗi kết nối');
+            }
+        }
+
+        // --- LẮNG NGHE THỜI GIAN THỰC (REALTIME LISTENERS) ---
+        function setupRealtimeListeners() {
+            if (!currentUser) return;
+
+            const docsRef = collection(db, 'artifacts', appId, 'public', 'data', 'documents');
+            const tasksRef = collection(db, 'artifacts', appId, 'public', 'data', 'assignments');
+            const membersRef = collection(db, 'artifacts', appId, 'public', 'data', 'members');
+
+            // Lắng nghe Thành viên
+            onSnapshot(query(membersRef), (snapshot) => {
+                const members = [];
+                snapshot.forEach(doc => members.push({ id: doc.id, ...doc.data() }));
+                members.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+                renderMembers(members);
+            }, (error) => showToast("Lỗi đồng bộ thành viên.", "error"));
+
+            // Lắng nghe Tài liệu
+            onSnapshot(query(docsRef), (snapshot) => {
+                const docs = [];
+                snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
+                docs.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                renderDocuments(docs);
+            }, (error) => showToast("Lỗi đồng bộ tài liệu.", "error"));
+
+            // Lắng nghe Bài tập
+            onSnapshot(query(tasksRef), (snapshot) => {
+                const tasks = [];
+                snapshot.forEach(doc => tasks.push({ id: doc.id, ...doc.data() }));
+                tasks.sort((a, b) => {
+                    if (a.completed !== b.completed) return a.completed ? 1 : -1;
+                    return (a.deadline || "").localeCompare(b.deadline || "");
+                });
+                renderTasks(tasks);
+            }, (error) => showToast("Lỗi đồng bộ bài tập.", "error"));
+        }
+
+        // Render Thành viên
+        function renderMembers(members) {
+            document.getElementById('member-loading').style.display = 'none';
+            document.getElementById('member-notice').classList.remove('hidden');
+            const listEl = document.getElementById('member-list');
+            document.getElementById('member-count').innerText = `${members.length} thành viên`;
+            
+            listEl.innerHTML = '';
+            
+            members.forEach(member => {
+                const div = document.createElement('div');
+                div.className = 'glass-panel rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow text-center relative group bg-white';
+                
+                const initials = (member.name || "A").substring(0, 2).toUpperCase();
+                const colors = ['4f46e5', 'ec4899', '10b981', 'f59e0b', '8b5cf6', 'ef4444'];
+                const color = colors[(member.name || "").length % colors.length];
+
+                div.innerHTML = `
+                    <!-- Nút Xóa Thành Viên (Chỉ hiện khi hover) -->
+                    <button class="delete-member-btn absolute top-3 right-3 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded p-1.5 opacity-0 group-hover:opacity-100 transition-all z-10" data-id="${member.id}" title="Xóa thành viên này">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                    
+                    <img src="https://placehold.co/150x150/${color}/ffffff?text=${initials}" alt="Avatar" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-gray-50 shadow-sm object-cover">
+                    
+                    <div class="name-display flex items-center justify-center gap-2 mb-1" data-id="${member.id}">
+                        <h3 class="font-bold text-lg text-gray-900 truncate max-w-[150px]">${escapeHTML(member.name)}</h3>
+                        <button class="edit-name-btn text-gray-400 hover:text-indigo-600 transition p-1" data-id="${member.id}" title="Đổi tên">
+                            <i class="fa-solid fa-pen-to-square text-sm"></i>
+                        </button>
+                    </div>
+
+                    <div class="name-edit hidden flex items-center justify-center gap-1 mb-1" data-id="${member.id}">
+                        <input type="text" class="name-input w-28 px-2 py-1.5 text-sm border border-indigo-300 rounded focus:ring-2 focus:ring-indigo-500 outline-none text-center font-semibold" value="${escapeHTML(member.name)}">
+                        <button class="save-name-btn text-green-600 bg-green-50 p-1 rounded" data-id="${member.id}"><i class="fa-solid fa-check"></i></button>
+                        <button class="cancel-name-btn text-red-600 bg-red-50 p-1 rounded" data-id="${member.id}"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+
+                    <p class="text-indigo-600 text-sm font-medium mb-3">${escapeHTML(member.role)}</p>
+                    <p class="text-gray-500 text-xs line-clamp-2 h-8">${escapeHTML(member.description || 'Chưa có mô tả chi tiết.')}</p>
+                `;
+                listEl.appendChild(div);
+            });
+
+            // Gắn sự kiện Xóa
+            document.querySelectorAll('.delete-member-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if(confirm("Bạn có chắc chắn muốn xóa thành viên này? Dữ liệu sẽ biến mất trên tất cả thiết bị.")) {
+                        deleteMember(e.currentTarget.getAttribute('data-id'));
+                    }
+                });
+            });
+
+            // Gắn sự kiện sửa tên
+            document.querySelectorAll('.edit-name-btn').forEach(btn => btn.addEventListener('click', (e) => toggleEditName(e.currentTarget.getAttribute('data-id'), true)));
+            document.querySelectorAll('.cancel-name-btn').forEach(btn => btn.addEventListener('click', (e) => toggleEditName(e.currentTarget.getAttribute('data-id'), false)));
+            document.querySelectorAll('.save-name-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    const newName = document.querySelector(`.name-edit[data-id="${id}"] .name-input`).value.trim();
+                    if(newName) updateMemberName(id, newName);
+                });
+            });
+        }
+
+        // Render Tài liệu
+        function renderDocuments(docs) {
+            document.getElementById('doc-loading').style.display = 'none';
+            const listEl = document.getElementById('doc-list');
+            const emptyEl = document.getElementById('doc-empty');
+            
+            document.getElementById('doc-count').innerText = `${docs.length} mục`;
+            listEl.innerHTML = '';
+
+            if (docs.length === 0) {
+                emptyEl.classList.remove('hidden');
+            } else {
+                emptyEl.classList.add('hidden');
+                docs.forEach(doc => {
+                    const li = document.createElement('li');
+                    li.className = 'p-5 hover:bg-gray-50 flex items-start justify-between group transition-colors border-b border-gray-50 last:border-0';
+                    
+                    let icon = '<i class="fa-solid fa-link text-blue-500"></i>';
+                    if (doc.type === 'pdf') icon = '<i class="fa-regular fa-file-pdf text-red-500"></i>';
+                    if (doc.type === 'video') icon = '<i class="fa-brands fa-youtube text-red-600"></i>';
+
+                    li.innerHTML = `
+                        <div class="flex items-start gap-4">
+                            <div class="text-2xl mt-1 bg-gray-100 p-2 rounded-lg">${icon}</div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800 text-md">${escapeHTML(doc.title)}</h4>
+                                ${doc.link ? `<a href="${escapeHTML(doc.link)}" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm hover:underline mt-1 inline-block break-all max-w-[200px] sm:max-w-md"><i class="fa-solid fa-arrow-up-right-from-square text-xs mr-1"></i> Mở liên kết</a>` : '<span class="text-gray-400 text-sm">Không có link</span>'}
+                            </div>
+                        </div>
+                        <!-- Nút Xóa Tài Liệu -->
+                        <button class="delete-doc-btn text-gray-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all shrink-0 ml-4" data-id="${doc.id}" title="Xóa tài liệu">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    `;
+                    listEl.appendChild(li);
+                });
+
+                document.querySelectorAll('.delete-doc-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => deleteDocument(e.currentTarget.getAttribute('data-id')));
+                });
+            }
+        }
+
+        // Render Bài tập
+        function renderTasks(tasks) {
+            document.getElementById('task-loading').style.display = 'none';
+            const listEl = document.getElementById('task-list');
+            const emptyEl = document.getElementById('task-empty');
+            
+            listEl.innerHTML = '';
+
+            if (tasks.length === 0) {
+                emptyEl.classList.remove('hidden');
+            } else {
+                emptyEl.classList.add('hidden');
+                tasks.forEach(task => {
+                    const li = document.createElement('li');
+                    li.className = `p-4 flex items-center justify-between group transition-colors hover:bg-gray-50 ${task.completed ? 'bg-gray-50/50' : 'bg-white'}`;
+                    
+                    // Tính khoảng cách ngày
+                    const today = new Date().toISOString().split('T')[0];
+                    let dateColor = 'text-gray-500';
+                    let dateIcon = '<i class="fa-regular fa-calendar"></i>';
+                    
+                    if (!task.completed && task.deadline < today) {
+                        dateColor = 'text-red-500 font-semibold'; // Quá hạn
+                        dateIcon = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                    } else if (!task.completed && task.deadline === today) {
+                        dateColor = 'text-orange-500 font-semibold'; // Tới hạn hôm nay
+                    }
+
+                    li.innerHTML = `
+                        <div class="flex items-center gap-4 flex-grow">
+                            <!-- Checkbox hoàn thành -->
+                            <button class="toggle-task-btn text-2xl ${task.completed ? 'text-green-500 hover:text-green-600' : 'text-gray-300 hover:text-indigo-400'} transition-colors" data-id="${task.id}" data-status="${task.completed}">
+                                ${task.completed ? '<i class="fa-solid fa-square-check"></i>' : '<i class="fa-regular fa-square"></i>'}
+                            </button>
+                            <div>
+                                <h4 class="${task.completed ? 'text-gray-400 line-through' : 'text-gray-800 font-medium'} text-md transition-all">${escapeHTML(task.title)}</h4>
+                                <span class="text-xs mt-0.5 flex items-center gap-1 ${dateColor}">
+                                    ${dateIcon} Hạn: ${formatDate(task.deadline)}
+                                </span>
+                            </div>
+                        </div>
+                        <!-- Nút Xóa Bài Tập -->
+                        <button class="delete-task-btn text-gray-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all shrink-0 ml-4" data-id="${task.id}" title="Xóa bài tập">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    `;
+                    listEl.appendChild(li);
+                });
+
+                document.querySelectorAll('.toggle-task-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.currentTarget.getAttribute('data-id');
+                        const isCompleted = e.currentTarget.getAttribute('data-status') === 'true';
+                        toggleTaskStatus(id, !isCompleted); // Đảo ngược trạng thái
+                    });
+                });
+
+                document.querySelectorAll('.delete-task-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => deleteTask(e.currentTarget.getAttribute('data-id')));
+                });
+            }
+        }
+
+        // --- CÁC HÀM XÓA (DELETE) ---
+        async function deleteMember(id) {
+            if(!currentUser) return;
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'members', id));
+                showToast("Đã xóa thành viên khỏi nhóm.", "info");
+            } catch (error) { showToast("Lỗi xóa thành viên.", "error"); }
+        }
+
+        async function deleteDocument(id) {
+            if(!currentUser) return;
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'documents', id));
+                showToast("Đã xóa tài liệu.", "info");
+            } catch (error) { showToast("Lỗi xóa tài liệu.", "error"); }
+        }
+
+        async function deleteTask(id) {
+            if(!currentUser) return;
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'assignments', id));
+                showToast("Đã xóa bài tập.", "info");
+            } catch (error) { showToast("Lỗi xóa bài tập.", "error"); }
+        }
+
+        // --- CÁC HÀM THÊM/CẬP NHẬT ---
+        document.getElementById('member-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!currentUser) return;
+            
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'members'), {
+                    name: document.getElementById('member-name').value.trim(),
+                    role: document.getElementById('member-role').value.trim(),
+                    description: document.getElementById('member-desc').value.trim(),
+                    createdAt: Date.now()
+                });
+                e.target.reset();
+                showToast("Đã thêm thành viên!", "success");
+            } catch (error) { showToast("Lỗi thêm thành viên.", "error"); } 
+            finally { btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Thêm'; btn.disabled = false; }
+        });
+
+        async function updateMemberName(id, newName) {
+            if(!currentUser) return;
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'members', id), { name: newName });
+                toggleEditName(id, false);
+                showToast("Đã cập nhật tên.", "success");
+            } catch (error) { showToast("Lỗi cập nhật tên.", "error"); }
+        }
+
+        document.getElementById('doc-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!currentUser) return;
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'documents'), {
+                    title: document.getElementById('doc-title').value.trim(),
+                    link: document.getElementById('doc-link').value.trim(),
+                    type: document.getElementById('doc-type').value,
+                    createdAt: Date.now()
+                });
+                e.target.reset();
+                showToast("Đã thêm tài liệu mới!", "success");
+            } catch (error) { showToast("Lỗi thêm tài liệu.", "error"); } 
+            finally { btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Gửi vào kho chung'; btn.disabled = false; }
+        });
+
+        document.getElementById('task-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!currentUser) return;
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'assignments'), {
+                    title: document.getElementById('task-title').value.trim(),
+                    deadline: document.getElementById('task-deadline').value,
+                    completed: false,
+                    createdAt: Date.now()
+                });
+                e.target.reset();
+                document.getElementById('task-deadline').valueAsDate = new Date();
+                showToast("Đã giao bài tập mới!", "success");
+            } catch (error) { showToast("Lỗi thêm bài tập.", "error"); } 
+            finally { btn.disabled = false; }
+        });
+
+        async function toggleTaskStatus(id, isCompleted) {
+            if(!currentUser) return;
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'assignments', id), { completed: isCompleted });
+            } catch (error) { showToast("Lỗi cập nhật trạng thái.", "error"); }
+        }
+
+        // --- HÀM TIỆN ÍCH ---
+        function toggleEditName(id, isEditing) {
+            const displayEl = document.querySelector(`.name-display[data-id="${id}"]`);
+            const editEl = document.querySelector(`.name-edit[data-id="${id}"]`);
+            if (isEditing) {
+                displayEl.classList.add('hidden');
+                editEl.classList.remove('hidden');
+            } else {
+                displayEl.classList.remove('hidden');
+                editEl.classList.add('hidden');
+            }
+        }
+
+        function escapeHTML(str) {
+            return str ? str.replace(/[&<>'"]/g, tag => ({'&': '&amp;','<': '&lt;','>': '&gt;',"'": '&#39;','"': '&quot;'}[tag] || tag)) : '';
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const parts = dateString.split('-');
+            return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : dateString;
+        }
+
+        window.showToast = function(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let icon = '<i class="fa-solid fa-circle-info text-blue-500"></i>';
+            let borderClass = 'border-l-4 border-blue-500';
+            
+            if(type === 'success') { icon = '<i class="fa-solid fa-circle-check text-green-500"></i>'; borderClass = 'border-l-4 border-green-500'; } 
+            else if(type === 'error') { icon = '<i class="fa-solid fa-triangle-exclamation text-red-500"></i>'; borderClass = 'border-l-4 border-red-500'; }
+
+            toast.className = `toast ${borderClass}`;
+            toast.innerHTML = `<div class="text-xl">${icon}</div><div class="text-sm font-medium text-gray-700">${message}</div>`;
+            container.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Khởi động
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('task-deadline').valueAsDate = new Date();
+            initApp();
+        });
+    </script>
+
+    <!-- Tab Switching Logic -->
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-indigo-700', 'text-white');
+                btn.classList.add('text-indigo-100', 'hover:bg-indigo-500/50');
+            });
+            
+            document.getElementById('content-' + tabId).classList.add('active');
+            const activeBtn = document.getElementById('tab-' + tabId);
+            activeBtn.classList.add('active', 'bg-indigo-700', 'text-white');
+            activeBtn.classList.remove('text-indigo-100', 'hover:bg-indigo-500/50');
+        }
+    </script>
+</body>
+</html>
