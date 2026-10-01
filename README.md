@@ -1,1 +1,0 @@
-# chanbomaydi.github.io
