@@ -3,419 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NHÓM HOÁ - Quản lý Nhóm Làm Việc</title>
-    <!-- Tailwind CSS -->
+    <title>NHÓM HOÁ - Đội Hình Trong Mơ</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root {
-            --pitch-green: #2e7d32;
-            --pitch-light: #388e3c;
-            --navy-blue: #0a192f;
-            --neon-green: #39ff14;
-            --glass-bg: rgba(10, 25, 47, 0.7);
-            --glass-border: rgba(57, 255, 20, 0.3);
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--navy-blue);
-            color: #e2e8f0;
-            margin: 0;
-            min-height: 100vh;
-            overflow-x: hidden;
-            /* Nền sân vận động đơn giản */
-            background-image: 
-                linear-gradient(rgba(10, 25, 47, 0.85), rgba(10, 25, 47, 0.85)),
-                repeating-linear-gradient(
-                    0deg,
-                    var(--pitch-green),
-                    var(--pitch-green) 50px,
-                    var(--pitch-light) 50px,
-                    var(--pitch-light) 100px
-                );
-            background-attachment: fixed;
-        }
-
-        h1, h2, h3, .font-teko {
-            font-family: 'Teko', sans-serif;
-        }
-
-        /* Glassmorphism Panels */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-        }
-        .glass-panel:hover {
-            border-color: rgba(57, 255, 20, 0.6);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 15px rgba(57, 255, 20, 0.1);
-        }
-
-        /* Neon Text & Buttons */
-        .text-neon {
-            color: var(--neon-green);
-            text-shadow: 0 0 5px var(--neon-green), 0 0 10px rgba(57, 255, 20, 0.5);
-        }
-        .btn-neon {
-            background: rgba(57, 255, 20, 0.1);
-            color: var(--neon-green);
-            border: 1px solid var(--neon-green);
-            box-shadow: 0 0 8px rgba(57, 255, 20, 0.3), inset 0 0 8px rgba(57, 255, 20, 0.1);
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            font-family: 'Teko', sans-serif;
-            letter-spacing: 1px;
-            font-size: 1.1rem;
-        }
-        .btn-neon:hover {
-            background: var(--neon-green);
-            color: var(--navy-blue);
-            box-shadow: 0 0 20px rgba(57, 255, 20, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-
-        /* Inputs */
-        .custom-input {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            border-radius: 6px;
-            padding: 8px 12px;
-            width: 100%;
-            transition: all 0.2s;
-        }
-        .custom-input:focus {
-            outline: none;
-            border-color: var(--neon-green);
-            box-shadow: 0 0 8px rgba(57, 255, 20, 0.3);
-        }
-
-        /* Tabs */
-        .tab-content { display: none; animation: fadeIn 0.4s ease; }
-        .tab-content.active { display: block; }
+        @import url('https://fonts.googleapis.com/css2?family=Teko:wght@400;600;700&display=swap');
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .nav-tab {
+        body {
             font-family: 'Teko', sans-serif;
+            background-color: #06142e;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(20, 50, 100, 0.8) 0%, rgba(6, 20, 46, 0.95) 100%),
+                url('https://images.unsplash.com/photo-1518605368461-1e1e38ce151d?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #e2e8f0;
             font-size: 1.2rem;
-            color: #94a3b8;
-            padding: 0.5rem 1rem;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .nav-tab:hover { color: white; }
-        .nav-tab.active {
-            color: var(--neon-green);
-            border-bottom-color: var(--neon-green);
-            text-shadow: 0 0 8px rgba(57, 255, 20, 0.4);
+            margin: 0;
+            padding: 0;
         }
 
-        /* Toast Notifications */
-        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 50; display: flex; flex-direction: column; gap: 10px; }
-        .toast {
-            background: rgba(10, 25, 47, 0.95); border-left: 4px solid var(--neon-green); backdrop-filter: blur(5px);
-            color: white; padding: 12px 20px; border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            display: flex; align-items: center; gap: 12px; transform: translateX(120%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .glass-panel {
+            background: rgba(10, 25, 55, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(45, 212, 191, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
         }
-        .toast.show { transform: translateX(0); }
-        .toast.error { border-left-color: #ef4444; }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-        ::-webkit-scrollbar-thumb { background: rgba(57, 255, 20, 0.3); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--neon-green); }
+        .neon-text {
+            color: #2dd4bf;
+            text-shadow: 0 0 10px rgba(45, 212, 191, 0.6);
+        }
 
-        /* Custom Modal */
-        #custom-modal { backdrop-filter: blur(8px); }
+        .neon-border {
+            border: 1px solid #2dd4bf;
+            box-shadow: 0 0 10px rgba(45, 212, 191, 0.3);
+        }
+
+        .fut-card {
+            background: linear-gradient(135deg, rgba(20, 40, 90, 0.9) 0%, rgba(10, 15, 30, 0.95) 100%);
+            border: 2px solid #eab308;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
+        }
+        .fut-card:hover { transform: translateY(-5px); }
+        .fut-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent);
+            transform: skewX(-25deg);
+            animation: shine 4s infinite;
+        }
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 200%; }
+            100% { left: 200%; }
+        }
+
+        .nav-btn { transition: all 0.3s; cursor: pointer; }
+        .nav-btn.active { 
+            background: rgba(45, 212, 191, 0.2); 
+            border-bottom: 3px solid #2dd4bf; 
+            color: #2dd4bf; 
+        }
+        .nav-btn:hover:not(.active) { background: rgba(45, 212, 191, 0.1); }
+
+        #custom-modal { display: none; }
+        #custom-modal.active { display: flex; }
     </style>
 </head>
-<body class="flex flex-col">
+<body class="min-h-screen flex flex-col items-center py-6 px-4">
 
-    <!-- Header -->
-    <div class="w-full max-w-6xl mx-auto px-4 pt-6 pb-2">
-        <header class="glass-panel px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-full border-2 border-green-400 flex items-center justify-center bg-black/30 shadow-[0_0_15px_rgba(57,255,20,0.4)]">
-                    <i class="fa-solid fa-futbol text-2xl text-neon"></i>
-                </div>
-                <div>
-                    <h1 class="text-4xl font-teko font-bold text-white tracking-wide uppercase">NHÓM <span class="text-neon">HOÁ</span></h1>
-                    <div class="flex items-center gap-2 text-xs font-medium text-gray-400 mt-[-4px]">
-                        <div class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" id="status-dot"></div>
-                        <span id="status-text">Đang kết nối sân vận động...</span>
-                    </div>
+    <!-- Phần Tiêu đề & Menu -->
+    <div class="w-full max-w-6xl glass-panel rounded-2xl p-6 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-full border-2 border-[#2dd4bf] flex items-center justify-center bg-blue-900 shadow-[0_0_15px_rgba(45,212,191,0.5)]">
+                <i class="fas fa-futbol text-3xl text-[#2dd4bf] animate-bounce"></i>
+            </div>
+            <div>
+                <h1 class="text-4xl font-bold text-white tracking-wider">NHÓM <span class="text-yellow-400">HOÁ</span></h1>
+                <div class="flex items-center gap-2 text-sm text-gray-300">
+                    <div id="status-dot" class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]"></div>
+                    <span id="status-text" class="font-sans text-sm">Đang kết nối trung tâm dữ liệu...</span>
                 </div>
             </div>
-
-            <!-- Navigation -->
-            <nav class="flex space-x-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 hide-scrollbar">
-                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-tab active flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-chart-pie"></i> Tổng Quan</button>
-                <button onclick="switchTab('members')" id="tab-members" class="nav-tab flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-users"></i> Thành Viên</button>
-                <button onclick="switchTab('documents')" id="tab-documents" class="nav-tab flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-folder-open"></i> Tài Liệu</button>
-                <button onclick="switchTab('tasks')" id="tab-tasks" class="nav-tab flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-clipboard-list"></i> Bài Tập</button>
-                <button onclick="switchTab('game')" id="tab-game" class="nav-tab flex items-center gap-2 whitespace-nowrap text-yellow-400"><i class="fa-solid fa-gamepad"></i> Giải Trí</button>
-            </nav>
-        </header>
-    </div>
-
-    <main class="flex-grow w-full max-w-6xl mx-auto px-4 py-4 z-10 flex flex-col">
+        </div>
         
-        <!-- TAB: TỔNG QUAN -->
-        <div id="content-dashboard" class="tab-content active h-full">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-                <div class="glass-panel p-6 flex flex-col items-center justify-center text-center cursor-default group">
-                    <div class="w-16 h-16 rounded-full bg-blue-900/40 border border-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-user-group text-3xl text-blue-400"></i>
+        <div class="flex flex-wrap justify-center gap-2">
+            <button onclick="switchTab('members')" id="tab-members" class="nav-btn active px-5 py-2 rounded-t-lg font-semibold uppercase tracking-wide"><i class="fas fa-users mr-2"></i>Đội hình</button>
+            <button onclick="switchTab('docs')" id="tab-docs" class="nav-btn px-5 py-2 rounded-t-lg font-semibold uppercase tracking-wide"><i class="fas fa-folder-open mr-2"></i>Tài liệu</button>
+            <button onclick="switchTab('tasks')" id="tab-tasks" class="nav-btn px-5 py-2 rounded-t-lg font-semibold uppercase tracking-wide"><i class="fas fa-tasks mr-2"></i>Bài tập</button>
+            <button onclick="switchTab('game')" id="tab-game" class="nav-btn px-5 py-2 rounded-t-lg font-semibold uppercase tracking-wide"><i class="fas fa-gamepad mr-2"></i>Sút Phạt</button>
+        </div>
+    </div>
+
+    <!-- Khu vực hiển thị nội dung -->
+    <div id="content-area" class="w-full max-w-6xl">
+        
+        <!-- Tab 1: Đội hình -->
+        <div id="view-members" class="space-y-6">
+            <div class="glass-panel rounded-xl p-6 neon-border">
+                <h2 class="text-2xl font-bold mb-4 neon-text"><i class="fas fa-user-plus mr-2"></i>Chiêu Mộ Tân Binh</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input type="text" id="member-name" placeholder="Tên cầu thủ..." class="bg-blue-950/60 border border-blue-500 rounded p-3 text-white font-sans text-base focus:outline-none focus:border-teal-400">
+                    <div class="relative bg-blue-950/60 border border-blue-500 rounded p-3 text-white flex items-center justify-between cursor-pointer hover:border-teal-400 font-sans text-base">
+                        <span id="file-name-display" class="truncate text-gray-300">Ảnh đại diện (Chọn tệp)</span>
+                        <i class="fas fa-upload text-teal-400"></i>
+                        <input type="file" id="member-avatar" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="document.getElementById('file-name-display').innerText = this.files[0] ? this.files[0].name : 'Ảnh đại diện (Chọn tệp)'">
                     </div>
-                    <h3 class="text-gray-400 uppercase text-sm font-bold tracking-wider mb-1">Thành viên nhóm</h3>
-                    <p class="text-5xl font-teko text-white" id="stat-members">0</p>
+                    <input type="url" id="member-link" placeholder="Link Facebook/Zalo..." class="bg-blue-950/60 border border-blue-500 rounded p-3 text-white font-sans text-base focus:outline-none focus:border-teal-400">
                 </div>
-                
-                <div class="glass-panel p-6 flex flex-col items-center justify-center text-center cursor-default group">
-                    <div class="w-16 h-16 rounded-full bg-green-900/40 border border-green-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-file-pdf text-3xl text-green-400"></i>
-                    </div>
-                    <h3 class="text-gray-400 uppercase text-sm font-bold tracking-wider mb-1">Tài liệu đã gửi</h3>
-                    <p class="text-5xl font-teko text-white" id="stat-docs">0</p>
-                </div>
-                
-                <div class="glass-panel p-6 flex flex-col items-center justify-center text-center cursor-default group">
-                    <div class="w-16 h-16 rounded-full bg-orange-900/40 border border-orange-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-list-check text-3xl text-orange-400"></i>
-                    </div>
-                    <h3 class="text-gray-400 uppercase text-sm font-bold tracking-wider mb-1">Bài tập chưa làm</h3>
-                    <p class="text-5xl font-teko text-white" id="stat-tasks">0</p>
-                </div>
+                <button id="btn-add-member" class="mt-4 w-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-bold py-3 rounded uppercase tracking-widest transition-all text-xl"><i class="fas fa-signature mr-2"></i>Ký Hợp Đồng</button>
             </div>
-            
-            <div class="mt-8 glass-panel p-8 border-l-4 border-l-green-400 bg-gradient-to-r from-green-900/20 to-transparent">
-                <h2 class="font-teko text-3xl text-white mb-2"><i class="fa-solid fa-satellite-dish text-neon"></i> ĐỒNG BỘ THỜI GIAN THỰC ĐANG BẬT</h2>
-                <p class="text-gray-300">Đây là hệ thống quản lý nhóm hoạt động trên nền tảng Firebase. Mọi thao tác thêm, sửa, xóa từ máy của bạn sẽ lập tức xuất hiện trên màn hình của tất cả các thành viên khác trong nhóm.</p>
+            <div id="members-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div class="col-span-full text-center py-10 text-gray-400"><i class="fas fa-spinner fa-spin text-4xl mb-3"></i><br>Đang tải đội hình...</div>
             </div>
         </div>
 
-        <!-- TAB: THÀNH VIÊN -->
-        <div id="content-members" class="tab-content">
-            <!-- Form Thêm Thành Viên -->
-            <div class="glass-panel p-6 mb-6 border-t-2 border-t-green-400">
-                <h2 class="text-2xl font-teko text-white mb-4"><i class="fa-solid fa-user-plus text-neon"></i> THÊM THÀNH VIÊN MỚI</h2>
-                <form id="member-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-                    <div>
-                        <label class="block text-xs uppercase text-gray-400 mb-1">Tên thành viên</label>
-                        <input type="text" id="member-name" required placeholder="Nhập tên..." class="custom-input">
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase text-gray-400 mb-1">Ảnh đại diện (File)</label>
-                        <input type="file" id="member-avatar-file" accept="image/*" class="custom-input p-[5px] text-sm file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-green-500/20 file:text-green-400 hover:file:bg-green-500/30">
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase text-gray-400 mb-1">Link thông tin (Tùy chọn)</label>
-                        <input type="url" id="member-link" placeholder="Facebook, Zalo..." class="custom-input">
-                    </div>
-                    <div class="lg:col-span-1">
-                        <button type="submit" class="btn-neon w-full py-2 rounded flex items-center justify-center gap-2 h-[38px]">
-                            <i class="fa-solid fa-check"></i> LƯU THÀNH VIÊN
-                        </button>
-                    </div>
-                </form>
+        <!-- Tab 2: Tài liệu -->
+        <div id="view-docs" class="hidden space-y-6">
+            <div class="glass-panel rounded-xl p-6 neon-border">
+                <h2 class="text-2xl font-bold mb-4 neon-text"><i class="fas fa-file-upload mr-2"></i>Gửi Tài Liệu Chiến Thuật</h2>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <input type="text" id="doc-title" placeholder="Tên tài liệu..." class="flex-1 bg-blue-950/60 border border-blue-500 rounded p-3 text-white font-sans text-base focus:outline-none focus:border-teal-400">
+                    <input type="url" id="doc-url" placeholder="Link tài liệu (Drive, Docs...)" class="flex-1 bg-blue-950/60 border border-blue-500 rounded p-3 text-white font-sans text-base focus:outline-none focus:border-teal-400">
+                    <button id="btn-add-doc" class="bg-teal-500 hover:bg-teal-400 text-slate-900 font-bold py-3 px-8 rounded uppercase tracking-widest text-xl"><i class="fas fa-paper-plane"></i> Gửi</button>
+                </div>
             </div>
-
-            <!-- Danh sách -->
-            <div id="member-loading" class="text-center py-10">
-                <i class="fa-solid fa-spinner fa-spin text-3xl text-neon mb-2"></i>
-                <p class="font-teko text-xl text-gray-400">Đang tải danh sách...</p>
-            </div>
-            <div id="member-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <!-- Data renders here -->
-            </div>
+            <div id="docs-list" class="space-y-3"></div>
         </div>
 
-        <!-- TAB: TÀI LIỆU -->
-        <div id="content-documents" class="tab-content">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Form Tải liệu -->
-                <div class="lg:col-span-1">
-                    <div class="glass-panel p-6 sticky top-6 border-t-2 border-t-blue-400">
-                        <h2 class="text-2xl font-teko text-white mb-4"><i class="fa-solid fa-upload text-blue-400"></i> GỬI TÀI LIỆU</h2>
-                        <form id="doc-form" class="space-y-4">
-                            <div>
-                                <label class="block text-xs uppercase text-gray-400 mb-1">Tên tài liệu</label>
-                                <input type="text" id="doc-title" required class="custom-input" placeholder="Tóm tắt chương 1...">
-                            </div>
-                            <div>
-                                <label class="block text-xs uppercase text-gray-400 mb-1">Đường link (URL)</label>
-                                <input type="url" id="doc-link" required class="custom-input" placeholder="https://drive.google.com/...">
-                            </div>
-                            <button type="submit" class="btn-neon !border-blue-400 !text-blue-400 hover:!bg-blue-400 hover:!text-white !shadow-[0_0_8px_rgba(96,165,250,0.3)] w-full py-2 rounded mt-2">
-                                GỬI LÊN NHÓM
-                            </button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Danh sách tài liệu -->
-                <div class="lg:col-span-2">
-                    <div class="glass-panel overflow-hidden h-full flex flex-col">
-                        <div class="bg-black/40 px-6 py-3 border-b border-white/10">
-                            <h3 class="font-teko text-xl text-white tracking-wide">KHO TÀI LIỆU CHUNG</h3>
-                        </div>
-                        <div class="p-4 flex-grow overflow-y-auto max-h-[600px]">
-                            <ul id="doc-list" class="space-y-3"></ul>
-                            <div id="doc-empty" class="hidden py-10 text-center text-gray-500">
-                                <i class="fa-regular fa-folder-open text-4xl mb-2"></i>
-                                <p>Chưa có tài liệu nào.</p>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Tab 3: Bài tập -->
+        <div id="view-tasks" class="hidden space-y-6">
+            <div class="glass-panel rounded-xl p-6 neon-border">
+                <h2 class="text-2xl font-bold mb-4 neon-text"><i class="fas fa-dumbbell mr-2"></i>Giao Bài Tập Huấn Luyện</h2>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <input type="text" id="task-title" placeholder="Nội dung bài tập..." class="flex-1 bg-blue-950/60 border border-blue-500 rounded p-3 text-white font-sans text-base focus:outline-none focus:border-teal-400">
+                    <button id="btn-add-task" class="bg-teal-500 hover:bg-teal-400 text-slate-900 font-bold py-3 px-8 rounded uppercase tracking-widest text-xl"><i class="fas fa-plus"></i> Thêm</button>
                 </div>
             </div>
+            <div id="tasks-list" class="space-y-3"></div>
         </div>
 
-        <!-- TAB: BÀI TẬP -->
-        <div id="content-tasks" class="tab-content">
-            <div class="glass-panel p-6 mb-6 border-t-2 border-t-orange-400">
-                <h2 class="text-2xl font-teko text-white mb-4"><i class="fa-solid fa-plus text-orange-400"></i> GIAO BÀI TẬP MỚI</h2>
-                <form id="task-form" class="flex flex-col sm:flex-row gap-4 items-end">
-                    <div class="flex-grow">
-                        <label class="block text-xs uppercase text-gray-400 mb-1">Nội dung bài tập</label>
-                        <input type="text" id="task-title" required class="custom-input" placeholder="Làm bài 1, 2, 3 trang 15...">
-                    </div>
-                    <button type="submit" class="btn-neon !border-orange-400 !text-orange-400 hover:!bg-orange-400 hover:!text-white !shadow-[0_0_8px_rgba(251,146,60,0.3)] px-8 py-2 h-[38px] rounded whitespace-nowrap">
-                        THÊM BÀI
-                    </button>
-                </form>
-            </div>
-
-            <div class="glass-panel overflow-hidden">
-                <div class="bg-black/40 px-6 py-3 border-b border-white/10 flex justify-between text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    <span>Danh sách công việc</span>
-                    <span>Xóa</span>
+        <!-- Tab 4: Game -->
+        <div id="view-game" class="hidden">
+            <div class="glass-panel rounded-xl p-6 neon-border flex flex-col items-center">
+                <h2 class="text-4xl font-bold mb-2 text-yellow-400">SÚT PHẠT ĐỀN</h2>
+                <p class="text-gray-300 mb-4 font-sans text-sm">Canh chuẩn thủ môn, click chuột vào gôn để sút bóng!</p>
+                <div class="relative w-full max-w-[700px] aspect-[4/3] bg-green-700 border-4 border-white rounded-lg cursor-crosshair overflow-hidden shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]" id="game-container">
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[30%] border-b-4 border-l-4 border-r-4 border-white bg-[url('https://www.transparenttextures.com/patterns/net.png')]"></div>
+                    <div id="goalkeeper" class="absolute top-[25%] left-1/2 -translate-x-1/2 w-14 h-14 bg-red-600 border-2 border-white rounded-full flex items-center justify-center transition-all duration-300 shadow-lg z-10"><i class="fas fa-hands text-white text-xl"></i></div>
+                    <div id="ball" class="absolute bottom-[10%] left-1/2 -translate-x-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center text-black shadow-[0_5px_15px_rgba(0,0,0,0.5)] transition-all duration-500 z-20"><i class="fas fa-futbol text-2xl"></i></div>
+                    <div id="game-score" class="absolute top-4 left-4 text-3xl font-bold text-white drop-shadow-md z-30">Điểm: 0</div>
+                    <div id="game-msg" class="absolute inset-0 flex items-center justify-center text-5xl font-bold text-yellow-400 bg-black/60 hidden z-40 backdrop-blur-sm">VÀO!!!</div>
                 </div>
-                <ul id="task-list" class="divide-y divide-white/5 p-2"></ul>
-                <div id="task-empty" class="hidden py-10 text-center text-gray-500">
-                    <i class="fa-solid fa-check-double text-4xl mb-2"></i>
-                    <p>Mọi bài tập đã hoàn thành!</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB: GIẢI TRÍ -->
-        <div id="content-game" class="tab-content">
-            <div class="glass-panel p-4 text-center border-t-2 border-t-yellow-400 relative">
-                <h2 class="text-3xl font-teko text-yellow-400 mb-1">SÚT PHẠT PENALTY</h2>
-                <p class="text-sm text-gray-300 mb-4">Chạm/Click vào sân để sút bóng. Cố gắng ghi bàn không chạm thủ môn!</p>
-                
-                <div class="relative max-w-[600px] mx-auto w-full aspect-[4/3] rounded-lg overflow-hidden border-2 border-white/20 shadow-2xl">
-                    <!-- Overlay Bắt đầu / Kết thúc -->
-                    <div id="game-overlay" class="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-10 backdrop-blur-sm">
-                        <h3 class="text-5xl font-teko text-white mb-2" id="game-title-text">SẴN SÀNG SÚT?</h3>
-                        <p class="text-xl text-yellow-400 font-bold mb-6 hidden" id="game-score-text">Chuỗi ghi bàn: <span id="final-score">0</span></p>
-                        <button id="btn-start-game" class="btn-neon px-8 py-3 rounded-full text-xl font-bold">
-                            <i class="fa-solid fa-play"></i> VÀO SÂN
-                        </button>
-                    </div>
-
-                    <div class="absolute top-4 left-4 z-0 bg-black/50 px-4 py-1 rounded text-white font-teko text-2xl border border-white/10">
-                        ĐIỂM: <span id="game-score" class="text-yellow-400">0</span>
-                    </div>
-
-                    <canvas id="gameCanvas" class="w-full h-full bg-[#1b5e20] cursor-pointer block"></canvas>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Toast Container -->
-    <div id="toast-container"></div>
-
-    <!-- Custom Modal Confirm (thay cho window.confirm) -->
-    <div id="custom-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-        <div class="glass-panel p-6 max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300" id="modal-content-box">
-            <h3 class="text-2xl font-teko text-white mb-2 border-b border-white/10 pb-2"><i class="fa-solid fa-triangle-exclamation text-yellow-500"></i> XÁC NHẬN CHÍNH THỨC</h3>
-            <p id="confirm-msg" class="text-gray-300 py-4 font-medium">Bạn có chắc chắn muốn thực hiện hành động này?</p>
-            <div class="flex justify-end gap-3 mt-4">
-                <button id="modal-btn-cancel" class="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 text-white font-medium transition text-sm">HUỶ BỎ</button>
-                <button id="modal-btn-confirm" class="px-4 py-2 rounded bg-red-600 hover:bg-red-500 text-white font-medium transition text-sm shadow-[0_0_10px_rgba(220,38,38,0.5)]">ĐỒNG Ý XÓA</button>
             </div>
         </div>
     </div>
 
-    <script>
-        // Tab Switcher
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-            document.getElementById('content-' + tabId).classList.add('active');
-            document.getElementById('tab-' + tabId).classList.add('active');
-            if(tabId === 'game' && window.initCanvasSize) window.initCanvasSize();
+    <!-- Hộp thoại cảnh báo -->
+    <div id="custom-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center font-sans">
+        <div class="glass-panel neon-border p-6 rounded-xl max-w-sm w-full text-center">
+            <div class="w-16 h-20 bg-red-600 border-2 border-white rounded flex items-center justify-center mx-auto mb-4 shadow-[0_0_15px_rgba(220,38,38,0.6)] rotate-12"></div>
+            <h3 class="text-2xl font-bold mb-2 text-white font-teko">THẺ ĐỎ!</h3>
+            <p id="modal-msg" class="text-gray-300 mb-6">Bạn có chắc chắn muốn xóa không?</p>
+            <div class="flex gap-4 justify-center">
+                <button id="modal-cancel" class="px-6 py-2 rounded bg-gray-600 hover:bg-gray-500 text-white font-bold transition">Hủy</button>
+                <button id="modal-confirm" class="px-6 py-2 rounded bg-red-600 hover:bg-red-500 text-white font-bold transition">Xóa Bỏ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code kết nối Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+        // =========================================================================
+        // DÁN THÔNG TIN FIREBASE CỦA BẠN VÀO ĐOẠN DƯỚI ĐÂY (GIỮ NGUYÊN DẤU NGOẶC KÉP "")
+        // =========================================================================
+        const firebaseConfig = {
+             apiKey: "AIzaSyD4HZ1WMhcwvQbF2nCkpxE1JCcZcUQNWeg",
+             authDomain: "nhom-hoa-app.firebaseapp.com",
+  projectId: "nhom-hoa-app",
+  storageBucket: "nhom-hoa-app.firebasestorage.app",
+  messagingSenderId: "904960819246",
+  appId: "1:904960819246:web:3435f976d519fca4fa1fbf",
+  measurementId: "G-YWC7YFGBLR"
+};
+        // =========================================================================
+
+        let app, db;
+        
+        const updateStatus = (isOk, text) => {
+            document.getElementById('status-text').innerText = text;
+            const dot = document.getElementById('status-dot');
+            dot.className = `w-3 h-3 rounded-full ${isOk ? 'bg-green-400 shadow-[0_0_8px_#4ade80]' : 'bg-red-500 shadow-[0_0_8px_#ef4444]'}`;
+        };
+
+        try {
+            if(firebaseConfig.apiKey.includes("DÁN_API_KEY_CỦA_BẠN_VÀO_ĐÂY")) {
+                throw new Error("Chưa nhập cấu hình Firebase");
+            }
+            app = initializeApp(firebaseConfig);
+            db = getDatabase(app);
+            updateStatus(true, "Sân vận động đã sẵn sàng");
+        } catch(e) {
+            updateStatus(false, "Lỗi: Chưa kết nối máy chủ");
+            document.getElementById('members-list').innerHTML = '<div class="col-span-full text-center text-red-400 py-10 font-sans">Lỗi: Bạn chưa dán mã cấu hình Firebase vào code!</div>';
+            console.error(e);
         }
 
-        // Toast
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            let icon = type === 'success' ? '<i class="fa-solid fa-check-circle text-green-400"></i>' : 
-                       type === 'error' ? '<i class="fa-solid fa-circle-exclamation text-red-400"></i>' : 
-                       '<i class="fa-solid fa-info-circle text-blue-400"></i>';
-            toast.className = `toast ${type === 'error' ? 'error' : ''}`;
-            toast.innerHTML = `<div class="text-xl">${icon}</div><div class="font-medium text-sm">${message}</div>`;
-            container.appendChild(toast);
-            setTimeout(() => toast.classList.add('show'), 10);
-            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
-        }
-
-        // Custom Confirm Modal Logic
-        let modalResolveFunc = null;
-        function customConfirm(msg) {
-            return new Promise(resolve => {
-                const modal = document.getElementById('custom-modal');
-                const content = document.getElementById('modal-content-box');
-                document.getElementById('confirm-msg').innerText = msg;
-                
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modal.classList.remove('opacity-0');
-                    content.classList.remove('scale-95');
-                }, 10);
-
-                modalResolveFunc = resolve;
+        window.switchTab = (tabId) => {
+            ['members', 'docs', 'tasks', 'game'].forEach(id => {
+                document.getElementById('view-' + id).classList.add('hidden');
+                document.getElementById('tab-' + id).classList.remove('active');
             });
-        }
-        
-        function closeModal(result) {
-            const modal = document.getElementById('custom-modal');
-            const content = document.getElementById('modal-content-box');
-            modal.classList.add('opacity-0');
-            content.classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-            if(modalResolveFunc) modalResolveFunc(result);
-        }
+            document.getElementById('view-' + tabId).classList.remove('hidden');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        };
 
-        document.getElementById('modal-btn-cancel').addEventListener('click', () => closeModal(false));
-        document.getElementById('modal-btn-confirm').addEventListener('click', () => closeModal(true));
-        
-        // Escape HTML
-        const escapeHTML = str => str ? str.replace(/[&<>'"]/g, tag => ({'&': '&amp;','<': '&lt;','>': '&gt;',"'": '&#39;','"': '&quot;'}[tag])) : '';
+        const showModal = (msg) => {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('custom-modal');
+                document.getElementById('modal-msg').innerText = msg;
+                modal.classList.add('active');
+                
+                document.getElementById('modal-confirm').onclick = () => { modal.classList.remove('active'); resolve(true); };
+                document.getElementById('modal-cancel').onclick = () => { modal.classList.remove('active'); resolve(false); };
+            });
+        };
 
-        // Image Resize Helper (Canvas ẩn)
-        function resizeImageBase64(file, maxWidth = 150) {
-            return new Promise((resolve, reject) => {
-                if(!file || !file.type.startsWith('image/')) return resolve(null);
+        const resizeImageBase64 = (file) => {
+            return new Promise((resolve) => {
+                if(!file) return resolve(null);
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = (e) => {
@@ -423,485 +250,181 @@
                     img.src = e.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        let width = img.width, height = img.height;
-                        if(width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
-                        }
-                        canvas.width = width; canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
+                        let w = img.width, h = img.height;
+                        if(w > 150) { h = Math.round((h * 150) / w); w = 150; }
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                         resolve(canvas.toDataURL('image/jpeg', 0.8));
                     };
-                    img.onerror = () => resolve(null);
                 };
-                reader.onerror = () => resolve(null);
             });
-        }
-    </script>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global variables for Firebase environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'nhomhoa-app';
-       const firebaseConfig = {
-  apiKey: "AIzaSyD4HZ1WMhcwvQbF2nCkpxE1JCcZcUQNWeg",
-  authDomain: "nhom-hoa-app.firebaseapp.com",
-  projectId: "nhom-hoa-app",
-  storageBucket: "nhom-hoa-app.firebasestorage.app",
-  messagingSenderId: "904960819246",
-  appId: "1:904960819246:web:3435f976d519fca4fa1fbf",
-  measurementId: "G-YWC7YFGBLR"
-        const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        let app, db, auth, currentUser;
-
-        const updateStatus = (isOk, text) => {
-            document.getElementById('status-text').innerText = text;
-            const dot = document.getElementById('status-dot');
-            dot.className = `w-2 h-2 rounded-full ${isOk ? 'bg-green-400 shadow-[0_0_8px_#4ade80]' : 'bg-red-500 shadow-[0_0_8px_#ef4444]'}`;
         };
 
-        async function initFirebase() {
-            if (!firebaseConfig) {
-                updateStatus(false, 'Lỗi: Không tìm thấy DB');
-                showToast("Hệ thống chưa kết nối cơ sở dữ liệu.", "error");
-                return;
-            }
-
-            try {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                if (initialToken) await signInWithCustomToken(auth, initialToken);
-                else await signInAnonymously(auth);
-
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        currentUser = user;
-                        updateStatus(true, 'Kết nối ổn định (Real-time ON)');
-                        attachRealtimeListeners();
-                    } else {
-                        updateStatus(false, 'Mất kết nối máy chủ');
-                    }
-                });
-            } catch (error) {
-                updateStatus(false, 'Lỗi xác thực');
-                console.error(error);
-            }
-        }
-
-        // --- Gắn các Listener Realtime ---
-        function attachRealtimeListeners() {
-            if (!currentUser) return;
-
-            // 1. Members List
-            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'members')), (snap) => {
-                const members = [];
-                snap.forEach(d => members.push({ id: d.id, ...d.data() }));
-                members.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-                document.getElementById('stat-members').innerText = members.length;
-                renderMembers(members);
-            }, err => showToast("Lỗi đồng bộ thành viên", "error"));
-
-            // 2. Documents List
-            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'documents')), (snap) => {
-                const docs = [];
-                snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
-                docs.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-                document.getElementById('stat-docs').innerText = docs.length;
-                renderDocs(docs);
-            }, err => showToast("Lỗi đồng bộ tài liệu", "error"));
-
-            // 3. Tasks List
-            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'tasks')), (snap) => {
-                const tasks = [];
-                let pending = 0;
-                snap.forEach(d => {
-                    const data = d.data();
-                    tasks.push({ id: d.id, ...data });
-                    if(!data.completed) pending++;
-                });
-                tasks.sort((a, b) => {
-                    if (a.completed !== b.completed) return a.completed ? 1 : -1;
-                    return (b.createdAt || 0) - (a.createdAt || 0);
-                });
-                document.getElementById('stat-tasks').innerText = pending;
-                renderTasks(tasks);
-            }, err => showToast("Lỗi đồng bộ bài tập", "error"));
-        }
-
-        // --- Render UI Functions ---
-        function renderMembers(members) {
-            document.getElementById('member-loading').style.display = 'none';
-            const list = document.getElementById('member-list');
-            list.innerHTML = '';
-
-            members.forEach(m => {
-                const div = document.createElement('div');
-                div.className = 'glass-panel p-5 text-center relative group overflow-hidden bg-slate-800/40 hover:bg-slate-800/60';
-                
-                const initial = (m.name || 'X').substring(0,1).toUpperCase();
-                const avatarSrc = m.avatar || `https://placehold.co/150x150/0f172a/39ff14?text=${initial}&font=Inter`;
-                
-                let linkHtml = m.link ? `<a href="${escapeHTML(m.link)}" target="_blank" class="inline-block mt-3 px-4 py-1 text-xs rounded-full bg-blue-900/40 border border-blue-500 text-blue-300 hover:bg-blue-600 hover:text-white transition"><i class="fa-solid fa-link"></i> Xem Thông Tin</a>` : '';
-
-                div.innerHTML = `
-                    <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button class="edit-mem-btn text-yellow-400 hover:text-yellow-300 p-1 bg-black/50 rounded" data-id="${m.id}" title="Đổi tên"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button class="del-mem-btn text-red-500 hover:text-red-400 p-1 bg-black/50 rounded" data-id="${m.id}" title="Xóa"><i class="fa-solid fa-trash-can"></i></button>
-                    </div>
-                    
-                    <div class="w-20 h-20 mx-auto mb-3 rounded-full border-2 border-green-500 p-1 shadow-[0_0_10px_rgba(34,197,94,0.3)]">
-                        <img src="${avatarSrc}" class="w-full h-full rounded-full object-cover bg-black" alt="Avatar">
-                    </div>
-                    
-                    <div class="name-view" data-id="${m.id}">
-                        <h3 class="font-teko text-2xl text-white tracking-wide truncate">${escapeHTML(m.name)}</h3>
-                    </div>
-
-                    <div class="name-edit hidden flex-col items-center gap-2 mb-1" data-id="${m.id}">
-                        <input type="text" class="custom-input py-1 text-center text-sm w-3/4" value="${escapeHTML(m.name)}">
-                        <div class="flex gap-2">
-                            <button class="save-name-btn text-green-400 text-sm"><i class="fa-solid fa-check"></i></button>
-                            <button class="cancel-name-btn text-gray-400 text-sm"><i class="fa-solid fa-xmark"></i></button>
+        if(db) {
+            onValue(ref(db, 'members'), (snapshot) => {
+                const list = document.getElementById('members-list');
+                list.innerHTML = '';
+                const data = snapshot.val();
+                if(!data) {
+                    list.innerHTML = '<div class="col-span-full text-center text-gray-400 py-10 font-sans">Đội hình chưa có ai. Hãy chiêu mộ cầu thủ đầu tiên!</div>';
+                    return;
+                }
+                Object.keys(data).forEach(id => {
+                    const m = data[id];
+                    const avatar = m.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=random&color=fff&size=150`;
+                    list.innerHTML += `
+                        <div class="fut-card p-4 flex flex-col items-center text-center">
+                            <button onclick="deleteMember('${id}')" class="absolute top-2 right-2 text-red-400 hover:text-red-500 bg-black/50 rounded-full w-8 h-8 flex justify-center items-center"><i class="fas fa-times"></i></button>
+                            <img src="${avatar}" class="w-24 h-24 rounded-full border-4 border-[#eab308] object-cover mb-3 shadow-[0_0_15px_rgba(234,179,8,0.5)]">
+                            <h3 class="text-3xl font-bold text-white mb-1 uppercase tracking-wider flex items-center justify-center gap-2">
+                                ${m.name} 
+                                <button onclick="editMember('${id}', '${m.name}')" class="text-teal-400 text-base hover:text-white"><i class="fas fa-pen"></i></button>
+                            </h3>
+                            ${m.link ? `<a href="${m.link}" target="_blank" class="mt-1 px-4 py-1 rounded-full bg-blue-900/80 text-sm font-sans text-yellow-400 hover:text-white hover:bg-blue-800 transition"><i class="fas fa-external-link-alt mr-1"></i>Hồ sơ</a>` : ''}
                         </div>
-                    </div>
-                    
-                    ${linkHtml}
-                `;
-                list.appendChild(div);
+                    `;
+                });
             });
 
-            // Gắn sự kiện Xóa
-            list.querySelectorAll('.del-mem-btn').forEach(btn => btn.addEventListener('click', async e => {
-                const id = e.currentTarget.dataset.id;
-                if(await customConfirm("Xóa thành viên này khỏi đội bóng?")) deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'members', id));
-            }));
-
-            // Gắn sự kiện Đổi tên
-            list.querySelectorAll('.edit-mem-btn').forEach(btn => btn.addEventListener('click', e => {
-                const id = e.currentTarget.dataset.id;
-                document.querySelector(`.name-view[data-id="${id}"]`).classList.add('hidden');
-                document.querySelector(`.name-edit[data-id="${id}"]`).classList.remove('hidden');
-                document.querySelector(`.name-edit[data-id="${id}"] input`).focus();
-            }));
-
-            list.querySelectorAll('.cancel-name-btn').forEach(btn => btn.addEventListener('click', e => {
-                const id = e.currentTarget.closest('.name-edit').dataset.id;
-                document.querySelector(`.name-view[data-id="${id}"]`).classList.remove('hidden');
-                document.querySelector(`.name-edit[data-id="${id}"]`).classList.add('hidden');
-            }));
-
-            list.querySelectorAll('.save-name-btn').forEach(btn => btn.addEventListener('click', async e => {
-                const id = e.currentTarget.closest('.name-edit').dataset.id;
-                const newName = document.querySelector(`.name-edit[data-id="${id}"] input`).value.trim();
-                if(newName && currentUser) {
-                    try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'members', id), { name: newName }); } 
-                    catch(err) {}
-                }
-            }));
-        }
-
-        function renderDocs(docs) {
-            const list = document.getElementById('doc-list');
-            const empty = document.getElementById('doc-empty');
-            list.innerHTML = '';
-            
-            if(docs.length === 0) empty.classList.remove('hidden');
-            else {
-                empty.classList.add('hidden');
-                docs.forEach(d => {
-                    const li = document.createElement('li');
-                    li.className = 'flex items-center justify-between p-3 rounded bg-blue-900/20 border border-blue-500/30 hover:bg-blue-900/40 transition group';
-                    li.innerHTML = `
-                        <div class="flex items-center gap-3 overflow-hidden">
-                            <i class="fa-solid fa-file-lines text-blue-400 text-xl shrink-0"></i>
-                            <div class="truncate">
-                                <h4 class="text-white font-medium truncate text-sm md:text-base">${escapeHTML(d.title)}</h4>
-                                <a href="${escapeHTML(d.link)}" target="_blank" class="text-xs text-gray-400 hover:text-blue-300 hover:underline flex items-center gap-1 mt-0.5"><i class="fa-solid fa-external-link-alt text-[10px]"></i> Xem tài liệu</a>
-                            </div>
-                        </div>
-                        <button class="del-doc-btn p-2 text-gray-500 hover:text-red-400 opacity-50 group-hover:opacity-100 transition shrink-0" data-id="${d.id}"><i class="fa-solid fa-trash"></i></button>
-                    `;
-                    list.appendChild(li);
-                });
+            document.getElementById('btn-add-member').onclick = async () => {
+                const name = document.getElementById('member-name').value.trim();
+                const link = document.getElementById('member-link').value.trim();
+                const file = document.getElementById('member-avatar').files[0];
+                if(!name) return alert("Vui lòng nhập tên cầu thủ!");
                 
-                list.querySelectorAll('.del-doc-btn').forEach(btn => btn.addEventListener('click', async e => {
-                    if(await customConfirm("Bạn muốn xóa tài liệu này?")) deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'documents', e.currentTarget.dataset.id));
-                }));
-            }
-        }
-
-        function renderTasks(tasks) {
-            const list = document.getElementById('task-list');
-            const empty = document.getElementById('task-empty');
-            list.innerHTML = '';
-
-            if(tasks.length === 0) empty.classList.remove('hidden');
-            else {
-                empty.classList.add('hidden');
-                tasks.forEach(t => {
-                    const li = document.createElement('li');
-                    li.className = `flex items-center justify-between p-3 transition group ${t.completed ? 'opacity-60 bg-green-900/10' : 'hover:bg-white/5'}`;
-                    li.innerHTML = `
-                        <div class="flex items-center gap-3 overflow-hidden flex-grow cursor-pointer toggle-task" data-id="${t.id}" data-status="${t.completed}">
-                            <div class="text-xl shrink-0 ${t.completed ? 'text-green-500' : 'text-gray-500 group-hover:text-orange-400'}">
-                                ${t.completed ? '<i class="fa-solid fa-square-check drop-shadow-[0_0_5px_#22c55e]"></i>' : '<i class="fa-regular fa-square"></i>'}
-                            </div>
-                            <span class="text-sm md:text-base ${t.completed ? 'line-through text-gray-500' : 'text-white'} truncate">${escapeHTML(t.title)}</span>
-                        </div>
-                        <button class="del-task-btn p-2 text-gray-500 hover:text-red-400 md:opacity-0 group-hover:opacity-100 transition shrink-0" data-id="${t.id}"><i class="fa-solid fa-xmark text-lg"></i></button>
-                    `;
-                    list.appendChild(li);
-                });
-
-                list.querySelectorAll('.toggle-task').forEach(btn => btn.addEventListener('click', e => {
-                    if(!currentUser) return;
-                    const id = e.currentTarget.dataset.id;
-                    const status = e.currentTarget.dataset.status === 'true';
-                    updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), { completed: !status });
-                }));
+                document.getElementById('btn-add-member').innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang xử lý...';
+                const avatarStr = await resizeImageBase64(file);
                 
-                list.querySelectorAll('.del-task-btn').forEach(btn => btn.addEventListener('click', async e => {
-                    e.stopPropagation(); // Ngăn click nhầm vào toggle
-                    if(await customConfirm("Xóa bài tập này vĩnh viễn?")) deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', e.currentTarget.dataset.id));
-                }));
-            }
+                push(ref(db, 'members'), { name, link, avatar: avatarStr, created: Date.now() })
+                .then(() => {
+                    document.getElementById('member-name').value = '';
+                    document.getElementById('member-link').value = '';
+                    document.getElementById('member-avatar').value = '';
+                    document.getElementById('file-name-display').innerText = 'Ảnh đại diện (Chọn tệp)';
+                }).finally(() => {
+                    document.getElementById('btn-add-member').innerHTML = '<i class="fas fa-signature mr-2"></i>Ký Hợp Đồng';
+                });
+            };
+
+            window.deleteMember = async (id) => { if(await showModal("Hủy hợp đồng với cầu thủ này?")) remove(ref(db, `members/${id}`)); };
+            window.editMember = async (id, oldName) => {
+                const newName = prompt("Đổi tên cầu thủ trên áo đấu:", oldName);
+                if(newName && newName.trim() !== "") update(ref(db, `members/${id}`), { name: newName.trim() });
+            };
+
+            onValue(ref(db, 'docs'), (snapshot) => {
+                const list = document.getElementById('docs-list');
+                list.innerHTML = '';
+                const data = snapshot.val();
+                if(!data) return;
+                Object.keys(data).forEach(id => {
+                    const d = data[id];
+                    list.innerHTML += `
+                        <div class="glass-panel p-4 rounded-lg flex justify-between items-center neon-border hover:bg-blue-900/50 transition">
+                            <a href="${d.url}" target="_blank" class="text-teal-400 font-bold hover:underline flex-1 text-2xl font-teko tracking-wide"><i class="fas fa-file-alt mr-3 text-yellow-400"></i>${d.title}</a>
+                            <button onclick="deleteDoc('${id}')" class="text-red-400 hover:text-red-500 p-2 text-xl"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                });
+            });
+
+            document.getElementById('btn-add-doc').onclick = () => {
+                const title = document.getElementById('doc-title').value.trim();
+                const url = document.getElementById('doc-url').value.trim();
+                if(title && url) {
+                    push(ref(db, 'docs'), { title, url, created: Date.now() });
+                    document.getElementById('doc-title').value = '';
+                    document.getElementById('doc-url').value = '';
+                }
+            };
+            window.deleteDoc = async (id) => { if(await showModal("Xóa tài liệu này khỏi hệ thống?")) remove(ref(db, `docs/${id}`)); };
+
+            onValue(ref(db, 'tasks'), (snapshot) => {
+                const list = document.getElementById('tasks-list');
+                list.innerHTML = '';
+                const data = snapshot.val();
+                if(!data) return;
+                Object.keys(data).forEach(id => {
+                    const t = data[id];
+                    list.innerHTML += `
+                        <div class="glass-panel p-4 rounded-lg flex justify-between items-center border-l-4 ${t.done ? 'border-green-500 bg-green-900/30' : 'border-yellow-500 bg-yellow-900/30'}">
+                            <div class="flex items-center gap-4 flex-1">
+                                <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask('${id}', this.checked)" class="w-6 h-6 accent-teal-500 cursor-pointer">
+                                <span class="${t.done ? 'line-through text-gray-500' : 'text-white'} text-2xl font-teko tracking-wide mt-1">${t.title}</span>
+                            </div>
+                            <button onclick="deleteTask('${id}')" class="text-red-400 hover:text-red-500 p-2 text-xl"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                });
+            });
+
+            document.getElementById('btn-add-task').onclick = () => {
+                const title = document.getElementById('task-title').value.trim();
+                if(title) {
+                    push(ref(db, 'tasks'), { title, done: false, created: Date.now() });
+                    document.getElementById('task-title').value = '';
+                }
+            };
+            window.toggleTask = (id, done) => { update(ref(db, `tasks/${id}`), { done }); };
+            window.deleteTask = async (id) => { if(await showModal("Hủy bài tập huấn luyện này?")) remove(ref(db, `tasks/${id}`)); };
         }
 
-        // --- Form Submit Handlers ---
-        document.getElementById('member-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            if(!currentUser) { showToast("Chưa kết nối máy chủ", "error"); return; }
-            
-            const btn = e.target.querySelector('button');
-            const originalText = btn.innerHTML;
-            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ĐANG XỬ LÝ...';
-            
-            try {
-                let base64Avatar = null;
-                const fileInput = document.getElementById('member-avatar-file');
-                if(fileInput.files.length > 0) {
-                    base64Avatar = await resizeImageBase64(fileInput.files[0], 150);
-                }
-
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'members'), {
-                    name: document.getElementById('member-name').value.trim(),
-                    link: document.getElementById('member-link').value.trim(),
-                    avatar: base64Avatar,
-                    createdAt: Date.now()
-                });
-                e.target.reset(); showToast("Thêm thành viên thành công!", "success");
-            } catch(err) { showToast("Lỗi khi lưu dữ liệu", "error"); console.error(err); }
-            finally { btn.disabled = false; btn.innerHTML = originalText; }
-        });
-
-        document.getElementById('doc-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            if(!currentUser) return;
-            try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'documents'), {
-                    title: document.getElementById('doc-title').value.trim(),
-                    link: document.getElementById('doc-link').value.trim(),
-                    createdAt: Date.now()
-                });
-                e.target.reset(); showToast("Đã tải tài liệu lên", "success");
-            } catch(err) { showToast("Lỗi tải tài liệu", "error"); }
-        });
-
-        document.getElementById('task-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            if(!currentUser) return;
-            try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'tasks'), {
-                    title: document.getElementById('task-title').value.trim(),
-                    completed: false,
-                    createdAt: Date.now()
-                });
-                e.target.reset(); showToast("Đã giao việc", "success");
-            } catch(err) { showToast("Lỗi tạo bài tập", "error"); }
-        });
-
-        // Initialize
-        window.addEventListener('DOMContentLoaded', initFirebase);
-    </script>
-
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        let aniId;
-        
-        // Khởi tạo kích thước logic bên trong canvas (luôn cố định tỷ lệ)
-        const GW = 800;
-        const GH = 600;
-        
-        let isPlaying = false;
         let score = 0;
-        let ball = { x: GW/2, y: GH - 60, radius: 15, isShooting: false, speed: 12 };
-        let goal = { x: GW/2 - 120, y: 30, w: 240, h: 80 };
-        let keeper = { w: 60, h: 20, x: GW/2, y: 110, speed: 5, dir: 1 };
+        const gc = document.getElementById('game-container');
+        const ball = document.getElementById('ball');
+        const gk = document.getElementById('goalkeeper');
+        const msg = document.getElementById('game-msg');
+        const scoreDisplay = document.getElementById('game-score');
 
-        window.initCanvasSize = () => {
-            canvas.width = GW;
-            canvas.height = GH;
-            resetBall();
-            drawFrame(); // Draw initial static frame
-        };
+        setInterval(() => {
+            const randomX = Math.floor(Math.random() * 60) + 20;
+            gk.style.left = randomX + '%';
+        }, 600);
 
-        function resetBall() {
-            ball.x = GW/2;
-            ball.y = GH - 60;
-            ball.isShooting = false;
-        }
-
-        function startGameGame() {
-            document.getElementById('game-overlay').classList.add('hidden');
-            score = 0;
-            document.getElementById('game-score').innerText = score;
-            keeper.speed = 5;
-            resetBall();
-            isPlaying = true;
-            if(aniId) cancelAnimationFrame(aniId);
-            gameLoop();
-        }
-
-        document.getElementById('btn-start-game').addEventListener('click', startGameGame);
-
-        // Click để sút bóng (Bóng bay thẳng lên)
-        canvas.addEventListener('mousedown', (e) => {
-            if(isPlaying && !ball.isShooting) {
-                ball.isShooting = true;
-            }
-        });
-        canvas.addEventListener('touchstart', (e) => {
-            if(isPlaying && !ball.isShooting) {
-                ball.isShooting = true;
-                e.preventDefault();
-            }
-        });
-
-        function gameOver() {
-            isPlaying = false;
-            document.getElementById('game-overlay').classList.remove('hidden');
-            document.getElementById('game-title-text').innerText = "CÚ SÚT HỎNG!";
-            document.getElementById('game-title-text').classList.add('text-red-500');
-            document.getElementById('game-title-text').classList.remove('text-white');
-            document.getElementById('game-score-text').classList.remove('hidden');
-            document.getElementById('final-score').innerText = score;
-            document.getElementById('btn-start-game').innerHTML = '<i class="fa-solid fa-rotate-right"></i> SÚT LẠI';
-        }
-
-        function updateGame() {
-            if(!isPlaying) return;
-
-            // Keeper movement
-            keeper.x += keeper.speed * keeper.dir;
-            if (keeper.x - keeper.w/2 < goal.x) { keeper.x = goal.x + keeper.w/2; keeper.dir *= -1; }
-            if (keeper.x + keeper.w/2 > goal.x + goal.w) { keeper.x = goal.x + goal.w - keeper.w/2; keeper.dir *= -1; }
-
-            // Ball movement
-            if (ball.isShooting) {
-                ball.y -= ball.speed;
+        gc.onclick = (e) => {
+            if(ball.style.bottom !== '10%') return; 
+            const rect = gc.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const targetPercentX = (clickX / rect.width) * 100;
+            
+            ball.style.bottom = '80%';
+            ball.style.left = targetPercentX + '%';
+            ball.style.transform = 'translate(-50%, -50%) scale(0.6) rotate(360deg)';
+            
+            setTimeout(() => {
+                const gkRect = gk.getBoundingClientRect();
+                const ballRect = ball.getBoundingClientRect();
                 
-                // Thu nhỏ bóng tạo cảm giác 3D bay ra xa
-                let scale = ball.y / GH;
-                let currentRadius = Math.max(ball.radius * scale, 8);
-
-                // Kiểm tra va chạm với Goal line (y ~ goal.y + goal.h)
-                if (ball.y < goal.y + goal.h + currentRadius) {
-                    // Check horizontal bounds of Goal
-                    if (ball.x > goal.x && ball.x < goal.x + goal.w) {
-                        // Check hit keeper
-                        if (ball.x > keeper.x - keeper.w/2 && ball.x < keeper.x + keeper.w/2 && ball.y < keeper.y + keeper.h + currentRadius) {
-                            // Hit Keeper! Missed
-                            gameOver();
-                        } else if (ball.y < goal.y + goal.h - 10) {
-                            // Goal!
-                            score++;
-                            document.getElementById('game-score').innerText = score;
-                            showToast("VÀOOOOOO! Lên điểm!", "success");
-                            keeper.speed = Math.min(keeper.speed + 1.5, 18); // Tăng độ khó
-                            resetBall();
-                        }
-                    } else if(ball.y < goal.y + goal.h) {
-                        // Missed outside bounds
-                        gameOver();
-                    }
+                const isSaved = ballRect.top < gkRect.bottom && ballRect.bottom > gkRect.top &&
+                               ballRect.left < gkRect.right && ballRect.right > gkRect.left;
+                
+                if(isSaved) {
+                    msg.innerText = "THỦ MÔN CẢN PHÁ!";
+                    msg.classList.replace('text-yellow-400', 'text-red-500');
+                    score = 0;
+                } else if (targetPercentX > 20 && targetPercentX < 80) { 
+                    msg.innerText = "VÀO!!!";
+                    msg.classList.replace('text-red-500', 'text-yellow-400');
+                    score += 10;
+                } else { 
+                    msg.innerText = "RA NGOÀI!";
+                    msg.classList.replace('text-yellow-400', 'text-gray-400');
+                    score = 0;
                 }
-            }
-        }
-
-        function drawFrame() {
-            // Nền cỏ
-            ctx.fillStyle = '#1b5e20';
-            ctx.fillRect(0, 0, GW, GH);
-            
-            // Vẽ sọc cỏ
-            ctx.fillStyle = '#2e7d32';
-            for(let i=0; i<GH; i+=40) { ctx.fillRect(0, i, GW, 20); }
-
-            // Vạch sân
-            ctx.strokeStyle = 'rgba(255,255,255,0.7)';
-            ctx.lineWidth = 3;
-            // Vòng cấm
-            ctx.strokeRect(GW/2 - 200, -10, 400, 200);
-            // Chấm penalty
-            ctx.beginPath(); ctx.arc(GW/2, GH - 60, 4, 0, Math.PI*2); ctx.fillStyle='white'; ctx.fill();
-
-            // Khung thành (Lưới)
-            ctx.strokeStyle = 'white';
-            ctx.lineWidth = 5;
-            ctx.strokeRect(goal.x, goal.y, goal.w, goal.h); // Cột xà
-            // Lưới caro
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-            for(let i=goal.x+10; i<goal.x+goal.w; i+=10) {
-                ctx.beginPath(); ctx.moveTo(i, goal.y); ctx.lineTo(i, goal.y+goal.h); ctx.stroke();
-            }
-            for(let i=goal.y+10; i<goal.y+goal.h; i+=10) {
-                ctx.beginPath(); ctx.moveTo(goal.x, i); ctx.lineTo(goal.x+goal.w, i); ctx.stroke();
-            }
-
-            // Thủ môn (Keeper)
-            ctx.fillStyle = '#facc15'; // Áo vàng
-            ctx.fillRect(keeper.x - keeper.w/2, keeper.y, keeper.w, keeper.h);
-            // Găng tay thủ môn
-            ctx.fillStyle = 'red';
-            ctx.beginPath(); ctx.arc(keeper.x - keeper.w/2, keeper.y + keeper.h/2, 6, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(keeper.x + keeper.w/2, keeper.y + keeper.h/2, 6, 0, Math.PI*2); ctx.fill();
-
-            // Bóng (Ball)
-            let scale = ball.isShooting ? Math.max(ball.y / GH, 0.4) : 1;
-            let currentRadius = ball.radius * scale;
-            
-            ctx.beginPath();
-            ctx.arc(ball.x, ball.y, currentRadius, 0, Math.PI*2);
-            ctx.fillStyle = 'white';
-            ctx.fill();
-            ctx.lineWidth = 2 * scale;
-            ctx.strokeStyle = 'black';
-            ctx.stroke();
-            // Vẽ 1 hoạ tiết đen đơn giản trên bóng
-            ctx.beginPath();
-            ctx.arc(ball.x, ball.y, currentRadius*0.4, 0, Math.PI*2);
-            ctx.fillStyle = 'black';
-            ctx.fill();
-        }
-
-        function gameLoop() {
-            if(!isPlaying) return;
-            updateGame();
-            drawFrame();
-            aniId = requestAnimationFrame(gameLoop);
-        }
-
-        // Vẽ lần đầu khi chưa ấn chơi
-        setTimeout(() => window.initCanvasSize(), 100);
+                
+                scoreDisplay.innerText = "Điểm: " + score;
+                msg.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    msg.classList.add('hidden');
+                    ball.style.transition = 'none';
+                    ball.style.bottom = '10%';
+                    ball.style.left = '50%';
+                    ball.style.transform = 'translate(-50%, 0) scale(1) rotate(0deg)';
+                    setTimeout(() => ball.style.transition = 'all 0.5s', 50); 
+                }, 1000);
+            }, 500);
+        };
     </script>
 </body>
 </html>
